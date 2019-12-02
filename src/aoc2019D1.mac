@@ -1,0 +1,35 @@
+ROUTINE aoc2019D1
+
+Part1(Path)[] PUBLIC
+{
+    SET fuel=0
+    DO FileReader^Util(Path,.file)
+    FOR i=1:1:file {
+        SET line=file(i)
+        SET fuel=fuel + $p(line/3,".")-2
+    }
+    QUIT fuel
+}
+
+
+Part2(Path)[] PUBLIC
+{
+    SET fuel=0
+    DO FileReader^Util(Path,.file)
+    FOR i=1:1:file {
+        SET mass=file(i)
+        SET fuelreq = $p(mass/3,".")-2
+        SET cont=1,next=fuelreq
+        WHILE cont {
+            SET req=$p(next/3,".")-2
+            IF req>0 {
+                SET next=req
+                SET fuelreq=fuelreq+req
+            } ELSE {
+                SET cont=0
+            }
+        }
+        SET fuel=fuel + fuelreq
+    }
+    QUIT (fuel)
+}
