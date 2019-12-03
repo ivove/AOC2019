@@ -10,22 +10,40 @@ Part1(Path)[]PUBLIC
             SET counter=counter+1
         }        
     }
-    SET step=4,position=0
-    SET instruction=intcode(position)
-    WHILE instruction'=99 {
-        SET posval1=intcode(position+1),posval2=intcode(position+2),target=intcode(position+3)
-        SET val1=intcode(posval1),val2=intcode(posval2)
-        IF instruction=1 {
-            SET intcode(target)=val1+val2
-        } ELSEIF instruction=2 {
-            SET intcode(target)=val1*val2
-        }	
-        SET position=position+step
-        IF position>counter {
-            SET position=position-counter
+    Set intcode(1)=12,intcode(2)=2
+    Do Go^aocIntcode(.intcode)
+    QUIT intcode(0)
+}
+
+Part2(Path,End)[]PUBLIC
+{
+    DO FileReader^Util(Path,.file)
+    SET counter=0
+    FOR i=1:1:file {
+        FOR y=1:1:$Length(file(i),",") {
+            SET intcode(counter)=$PIECE(file(i),",",y)
+            SET counter=counter+1
+        }        
+    }
+    Set verb=0,noun=0
+    Set cont=1
+    While cont,verb<100 {
+        Set noun=0
+        While cont,noun<100 {
+            Merge mem=intcode
+            Set mem(1)=verb,mem(2)=noun
+            Do Go^aocIntcode(.mem)
+            If mem(0)=End {
+                Set cont=0
+            } Else {
+                Set noun=noun+1
+            }
+        }
+        If cont {
+            Set verb=verb+1
         }
         
-        SET instruction=intcode(position)
     }
-    QUIT intcode(0)
+    
+    QUIT ((verb*100)+noun)
 }

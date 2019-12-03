@@ -1,0 +1,29 @@
+ROUTINE aocIntcode
+
+Go(Memory)[]PUBLIC
+{
+    SET position=0
+    SET instruction=Memory(position)
+    WHILE instruction'=99 {
+        IF instruction=1 {
+            SET position=$$Sum(position,.Memory)
+        } ELSEIF instruction=2 {
+            SET position=$$Multiply(position,.Memory)
+        }	       
+        SET instruction=Memory(position)
+    }
+
+}
+
+Sum(CurrentPosition,Memory){
+    SET posval1=Memory(CurrentPosition+1),posval2=Memory(CurrentPosition+2),target=Memory(CurrentPosition+3)
+    SET val1=Memory(posval1),val2=Memory(posval2)
+    Set Memory(target)=val1+val2
+    Quit CurrentPosition+4
+}
+Multiply(CurrentPosition,Memory){
+    SET posval1=Memory(CurrentPosition+1),posval2=Memory(CurrentPosition+2),target=Memory(CurrentPosition+3)
+    SET val1=Memory(posval1),val2=Memory(posval2)
+    Set Memory(target)=val1*val2
+    Quit CurrentPosition+4
+}
