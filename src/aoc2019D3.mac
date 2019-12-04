@@ -12,7 +12,6 @@ Part1(Path)[]PUBLIC
             Set dir=$e(val,1)
             Set dist=$e(val,2,*)
             set dy=0,dx=0
-            Write !,dir,*9,dist
             If dir="U" {
                 Set dy=1
             } ElseIf dir="D" {
@@ -24,8 +23,49 @@ Part1(Path)[]PUBLIC
             }
             For z=1:1:dist {
                 Set x=x+dx,y=y+dy
-                if $Data(map(x,y)){
+                if $Data(map(x,y)),map(x,y)'[i{
                     Set xdist=$ZAbs(x)+$ZAbs(y)
+                    If shortest>xdist {
+                        Set shortest=xdist
+                    }
+                    Set map(x,y)=map(x,y)_"/"_i
+                } Else {
+                    Set map(x,y)=i
+                }
+            }
+        }
+    }
+    Quit shortest
+}
+
+Part2(Path)[]PUBLIC
+{
+    Set shortest=99999999999
+    DO FileReader^Util(Path,.file)
+    FOR i=1:1:file {
+        Set line=file(i)
+        Set x=0,y=0
+        Set steps=0
+        For p=1:1:$length(line,",") {
+            Set val=$p(line,",",p)
+            Set dir=$e(val,1)
+            Set dist=$e(val,2,*)
+            set dy=0,dx=0
+            If dir="U" {
+                Set dy=1
+            } ElseIf dir="D" {
+                Set dy=-1
+            } ElseIf dir="R" {
+                Set dx=1
+            } ElseIf dir="L" {
+                Set dx=-1
+            }
+            For z=1:1:dist {
+                Set steps=steps+1
+                Set x=x+dx,y=y+dy
+                set step(i,x,y)=steps
+                if $Data(map(x,y)),map(x,y)'[i{
+                    Set xdist=step(1,x,y)+steps
                     If shortest>xdist {
                         Set shortest=xdist
                     }
