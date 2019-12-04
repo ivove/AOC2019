@@ -1,0 +1,74 @@
+ROUTINE aoc2019D4
+
+Part1(Input)[]PUBLIC
+{
+    Set from=$p(Input,"-")
+    Set to=$p(Input,"-",2)
+    Set counter=0
+    For i=from:1:to {
+        Set ok=$$Check(i)
+        If ok {
+            Set counter=counter+1
+        }
+        
+    }
+    Quit counter
+}
+
+Part2(Input)[]PUBLIC
+{
+    Set from=$p(Input,"-")
+    Set to=$p(Input,"-",2)
+    Set counter=0
+    For i=from:1:to {
+        Set ok=$$Check2(i)
+        If ok {
+            Set counter=counter+1
+        }
+        
+    }
+    Quit counter
+}
+
+Check(Password)[]public
+{
+    Set double=0
+    Set inc=1
+    Set len=$Length(Password)
+    Set i=1
+    While i<len,inc {
+        set a=$e(Password,i)
+        Set b=$e(Password,i+1)
+        if a=b { set double=1 }
+        if a>b { Set inc=0 }
+        Set i=i+1
+    }
+    q (inc&double)
+}
+
+Check2(Password)[]public
+{
+    Set double=0
+    Set inc=1
+    Set len=$Length(Password)
+    Set cnt=0
+    Set i=1
+    While i<len,inc {
+        set a=$e(Password,i)
+        Set b=$e(Password,i+1)
+        if a=b { set cnt=cnt+1 }
+        Else {
+            If cnt=1 {
+                Set double=1
+            }
+            Set cnt=0
+        }        
+        if a>b { Set inc=0 }
+        Set i=i+1
+    }
+    If cnt=1 {
+        Set double=1
+    }
+    
+    q (inc&double)
+}
