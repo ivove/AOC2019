@@ -3,27 +3,163 @@ ROUTINE aocIntcode
 Go(Memory)[]PUBLIC
 {
     SET position=0
-    SET instruction=Memory(position)
+    SET instruction=$$ParseInstruction(Memory(position),.m1,.m2,.m3)
     WHILE instruction'=99 {
         IF instruction=1 {
-            SET position=$$Sum(position,.Memory)
+            SET position=$$Sum(position,.Memory,m1,m2)
         } ELSEIF instruction=2 {
-            SET position=$$Multiply(position,.Memory)
-        }	       
-        SET instruction=Memory(position)
+            SET position=$$Multiply(position,.Memory,m1,m2)
+        } ElseIf instruction=3 {
+            Set position=$$Read(position,.Memory)
+        }	ElseIf instruction=4 {
+            Set position=$$Write(position,.Memory,m1)
+        } ElseIf instruction=5 {
+            Set position=$$JumpIfTrue(position,.Memory,m1,m2)
+        } ElseIf instruction=6 {
+            Set position=$$JumpIfFalse(position,.Memory,m1,m2)
+        } ElseIf instruction=7 {
+            Set position=$$Less(position,.Memory,m1,m2)
+        } ElseIf instruction=8 {
+            Set position=$$Equal(position,.Memory,m1,m2)
+        }
+        SET instruction=$$ParseInstruction(Memory(position),.m1,.m2,.m3)
     }
 
 }
 
-Sum(CurrentPosition,Memory){
+ParseInstruction(Instruction,M1,M2,M3){
+    Set Instruction=100000+Instruction
+    Set M3=$e(Instruction,2)
+    Set M2=$e(Instruction,3)
+    Set M1=$e(Instruction,4)
+    Quit +$e(Instruction,5,*)
+}
+
+Sum(CurrentPosition,Memory,M1,M2){
+    Set M1=$Get(M1,0),M2=$Get(M2,0)
     SET posval1=Memory(CurrentPosition+1),posval2=Memory(CurrentPosition+2),target=Memory(CurrentPosition+3)
-    SET val1=Memory(posval1),val2=Memory(posval2)
+    if M1=0 {
+        SET val1=Memory(posval1)
+    } Else {
+        Set val1=posval1
+    }
+    if M2=0 {
+        Set val2=Memory(posval2)
+    } Else {
+        Set val2=posval2
+    }    
     Set Memory(target)=val1+val2
     Quit CurrentPosition+4
 }
-Multiply(CurrentPosition,Memory){
+Multiply(CurrentPosition,Memory,M1,M2){
+    Set M1=$Get(M1,0),M2=$Get(M2,0)
     SET posval1=Memory(CurrentPosition+1),posval2=Memory(CurrentPosition+2),target=Memory(CurrentPosition+3)
-    SET val1=Memory(posval1),val2=Memory(posval2)
+    if M1=0 {
+        SET val1=Memory(posval1)
+    } Else {
+        Set val1=posval1
+    }
+    if M2=0 {
+        Set val2=Memory(posval2)
+    } Else {
+        Set val2=posval2
+    }
     Set Memory(target)=val1*val2
+    Quit CurrentPosition+4
+}
+Read(CurrentPosition,Memory){
+    Write !,"Read: "
+    Read xx
+    Set target=Memory(CurrentPosition+1)
+    Set Memory(target)=xx
+    q CurrentPosition+2
+}
+Write(CurrentPosition,Memory,M1){
+    SET posval1=Memory(CurrentPosition+1)
+    if M1=0 {
+        Write !,Memory(posval1)
+    } else{
+        Write !,posval1
+    }
+    q CurrentPosition+2
+}
+JumpIfFalse(CurrentPosition,Memory,M1,M2){
+    Set M1=$Get(M1,0),M2=$Get(M2,0)
+    SET posval1=Memory(CurrentPosition+1),posval2=Memory(CurrentPosition+2)
+    if M1=0 {
+        SET val1=Memory(posval1)
+    } Else {
+        Set val1=posval1
+    }
+    if M2=0 {
+        Set val2=Memory(posval2)
+    } Else {
+        Set val2=posval2
+    }
+    If val1=0 {
+        Set CurrentPosition=+val2
+    } else {
+        set CurrentPosition=CurrentPosition+3
+    }   
+    q CurrentPosition 
+}
+JumpIfTrue(CurrentPosition,Memory,M1,M2){
+    Set M1=$Get(M1,0),M2=$Get(M2,0)
+    SET posval1=Memory(CurrentPosition+1),posval2=Memory(CurrentPosition+2)
+    if M1=0 {
+        SET val1=Memory(posval1)
+    } Else {
+        Set val1=posval1
+    }
+    if M2=0 {
+        Set val2=Memory(posval2)
+    } Else {
+        Set val2=posval2
+    }
+    If val1'=0 {
+        Set CurrentPosition=val2
+    } else {
+        set CurrentPosition=CurrentPosition+3
+    }   
+    q CurrentPosition 
+}
+Less(CurrentPosition,Memory,M1,M2){
+    Set M1=$Get(M1,0),M2=$Get(M2,0)
+    SET posval1=Memory(CurrentPosition+1),posval2=Memory(CurrentPosition+2),target=Memory(CurrentPosition+3)
+    if M1=0 {
+        SET val1=Memory(posval1)
+    } Else {
+        Set val1=posval1
+    }
+    if M2=0 {
+        Set val2=Memory(posval2)
+    } Else {
+        Set val2=posval2
+    }
+    If val1<val2 {
+        Set Memory(target)=1
+    } Else {
+        Set Memory(target)=0
+    }
+    Quit CurrentPosition+4
+}
+Equal(CurrentPosition,Memory,M1,M2){
+    Set M1=$Get(M1,0),M2=$Get(M2,0)
+    SET posval1=Memory(CurrentPosition+1),posval2=Memory(CurrentPosition+2),target=Memory(CurrentPosition+3)
+    if M1=0 {
+        SET val1=Memory(posval1)
+    } Else {
+        Set val1=posval1
+    }
+    if M2=0 {
+        Set val2=Memory(posval2)
+    } Else {
+        Set val2=posval2
+    }
+    If val1=val2 {
+        Set Memory(target)=1
+    } Else {
+        Set Memory(target)=0
+    }
     Quit CurrentPosition+4
 }
