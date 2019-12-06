@@ -1,0 +1,67 @@
+ROUTINE aoc2019D6
+
+Part1(Path)[]PUBLIC
+{
+    DO FileReader^Util(Path,.file)
+    For i=1:1:file {
+        s line=file(i)
+        s $lb(a,b)=$Listfromstring(line,")")
+        s map(b)=a
+    }
+    Set count=0
+    Set xx=$o(map(""))
+    While xx'="" {
+        Set next=map(xx)
+        Set count=count+1
+        While $Data(map(next)) {
+            Set next=map(next)
+            set count=count+1
+        }
+        
+        Set xx=$Order(map(xx))
+    }
+    Quit count
+}
+
+Part2(Path)[]PUBLIC
+{
+    DO FileReader^Util(Path,.file)
+    For i=1:1:file {
+        s line=file(i)
+        s $lb(a,b)=$Listfromstring(line,")")
+        Set orbit(a)=b
+        s map(b,a)=""
+        s map(a,b)=""
+        If b="YOU" {
+            Set start=a
+        }
+         
+    }
+    Set max=99999999999
+    Do go(.map,.res,"",start,.orbit)
+    For i=1:1:res {
+        Set line=res(i)
+        If $length(line,"/")<max {
+            Set max=$Length(line,"/")
+        }        
+    }
+    q max-1
+}
+
+go(Map,Results,Current,Next,Orbit)[]
+{
+    //Write !,Next,*9,Current
+    If $get(Orbit(Next))="SAN" {
+        Set Results=$Get(Results)+1
+        Set Results(Results)=Current
+    } Else {
+        Set Current=Current_"/"_Next
+        Set next=$o(Map(Next,""))
+        While next'="" {
+            if Current'[next {
+                Do go(.Map,.Results,Current,next,.Orbit)
+            }
+            s next=$Order(Map(Next,next))
+        }        
+    }
+}
