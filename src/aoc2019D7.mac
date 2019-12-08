@@ -77,10 +77,40 @@ Part2(Path)[]PUBLIC
             SET intcode(counter)=$PIECE(file(i),",",y)
             SET counter=counter+1
         }        
-    }    
-    Merge a=intcode,b=intcode,c=intcode,d=intcode,e=intcode
-    
-    Do First(.intcode,.results,5,9,0)
+    } 
+    d getPhase(.p)
+    f x=1:1:p {   
+        Merge a=intcode,b=intcode,c=intcode,d=intcode,e=intcode
+        Set $lb(pa,pb,pc,pd,pe)=$Listfromstring(p(x))
+        Set cnt=1
+        s stre=0,posa=0,posb=0,posc=0,posd=0,pose=0
+        While $data(a) {
+            Set stra=stre
+            i cnt=1 { Set stra=pa_"/"_stre }
+            set posa=$$Go^aocIntcode(.a,.stra,1,posa)
+            zw stra
+            Set strb=stra
+            i cnt=1 { Set strb=pb_"/"_stra }
+            Set posb=$$Go^aocIntcode(.b,.strb,1,posb)
+            zw strb
+            Set strc=strb
+            i cnt=1 { Set strc=pc_"/"_strb }
+            Set posc=$$Go^aocIntcode(.c,.strc,1,posc)
+            zw strc
+            Set strd=strc
+            i cnt=1 { Set strd=pd_"/"_strc }
+            Set posd=$$Go^aocIntcode(.d,.strd,1,posd)
+            zw strd
+            Set stre=strd
+            i cnt=1 { Set stre=pe_"/"_strd }
+            Set pose=$$Go^aocIntcode(.e,.stre,1,pose)   
+            zw stre
+            Set cnt=cnt+1 
+        }
+        Set results(stre)=""
+    }
+
+    ;Do First(.intcode,.results,5,9,0)
     ;zw res
     ;s init=$Order(res(""))
     ;While init'="" {
@@ -88,8 +118,31 @@ Part2(Path)[]PUBLIC
     ;    Set init=$o(res(init))
     ;}
     Set res=$Order(results(""),-1)
-    Set output=res_$c(9)_results(res)
-    Quit output
+    ;Set output=res_$c(9)_results(res)
+    Quit res
+}
+
+getPhase(phases){
+    For a=5:1:9 {
+        For b=5:1:9 {
+            If b'=a {
+                For c=5:1:9 {
+                    If c'=a,c'=b {
+                        For d=5:1:9 {
+                            If d'=a,d'=b,d'=c {
+                                For e=5:1:9 {
+                                    If e'=a,e'=b,e'=c,e'=d {
+                                        Set phases=$g(phases)+1
+                                        Set phases(phases)=a_","_b_","_c_","_d_","_e
+                                    }                                    
+                                }                                
+                            }                            
+                        }                        
+                    }                    
+                }                
+            }            
+        }        
+    }    
 }
 
 First(intcode,results,from,to,initial)
