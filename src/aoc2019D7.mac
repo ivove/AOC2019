@@ -1,0 +1,136 @@
+ROUTINE aoc2019D7
+
+Part1(Path)[]PUBLIC
+{
+    DO FileReader^Util(Path,.file)
+    Set counter=0
+    FOR i=1:1:file {
+        FOR y=1:1:$Length(file(i),",") {
+            SET intcode(counter)=$PIECE(file(i),",",y)
+            SET counter=counter+1
+        }        
+    }
+    For ia=0:1:4 {
+        m a=intcode
+        s stra=ia_"/0"
+        Do Go^aocIntcode(.a,.stra)
+        For ib=0:1:4 {
+            ;w !,stra,*9,ia,*9,ib
+            m b=intcode
+            If ib'=ia {
+                Set strb=ib_"/"_stra
+                ;zw strb
+                Do Go^aocIntcode(.b,.strb)
+                For ic=0:1:4 {
+                    ;w !,stra,*9,ia,*9,ib,*9,ic
+                    Merge c=intcode
+                    If ic'=ia,ic'=ib {
+                        Set strc=ic_"/"_strb
+                        Do Go^aocIntcode(.c,.strc)
+                        For id=0:1:4 {
+                            Merge d=intcode
+                            If id'=ia,id'=ib,id'=ic {
+                                Set strd=id_"/"_strc
+                                Do Go^aocIntcode(.d,.strd)
+                                For ie=0:1:4 {
+                                    m e=intcode
+                                    If ie'=ia,ie'=ib,ie'=ic,ie'=id {
+                                        Set stre=ie_"/"_strd
+                                        Do Go^aocIntcode(.e,.stre)
+                                        ;w !,"--->",ia,*9,ib,*9,ic,*9,id,*9,ie,!
+                                        ;zw stre
+                                        Set results(stre)=""
+                                    }                                    
+                                }                                
+                            }                            
+                        }                        
+                    }                    
+                }                
+            }            
+        }
+    }
+    Quit $Order(results(""),-1)
+}
+
+Test(Path)[]PUBLIC
+{
+    DO FileReader^Util(Path,.file)
+    Set counter=0
+    FOR i=1:1:file {
+        FOR y=1:1:$Length(file(i),",") {
+            SET intcode(counter)=$PIECE(file(i),",",y)
+            SET counter=counter+1
+        }        
+    }
+    f i=0:1:4 {
+        Merge prog=intcode
+        Do Go^aocIntcode(.prog)
+    }
+}
+
+Part2(Path)[]PUBLIC
+{
+    DO FileReader^Util(Path,.file)
+    Set counter=0
+    FOR i=1:1:file {
+        FOR y=1:1:$Length(file(i),",") {
+            SET intcode(counter)=$PIECE(file(i),",",y)
+            SET counter=counter+1
+        }        
+    }    
+    Merge a=intcode,b=intcode,c=intcode,d=intcode,e=intcode
+    
+    Do First(.intcode,.results,5,9,0)
+    ;zw res
+    ;s init=$Order(res(""))
+    ;While init'="" {
+    ;    Do First(.intcode,.results,5,9,init)
+    ;    Set init=$o(res(init))
+    ;}
+    Set res=$Order(results(""),-1)
+    Set output=res_$c(9)_results(res)
+    Quit output
+}
+
+First(intcode,results,from,to,initial)
+{
+    For ia=from:1:to {
+        m a=intcode
+        s stra=ia_"/"_initial
+        Do Go^aocIntcode(.a,.stra)
+        For ib=from:1:to {
+            ;w !,stra,*9,ia,*9,ib
+            m b=intcode
+            If ib'=ia {
+                Set strb=ib_"/"_stra
+                ;zw strb
+                Do Go^aocIntcode(.b,.strb)
+                For ic=from:1:to {
+                    ;w !,stra,*9,ia,*9,ib,*9,ic
+                    Merge c=intcode
+                    If ic'=ia,ic'=ib {
+                        Set strc=ic_"/"_strb
+                        Do Go^aocIntcode(.c,.strc)
+                        For id=from:1:to {
+                            Merge d=intcode
+                            If id'=ia,id'=ib,id'=ic {
+                                Set strd=id_"/"_strc
+                                Do Go^aocIntcode(.d,.strd)
+                                For ie=from:1:to {
+                                    m e=intcode
+                                    If ie'=ia,ie'=ib,ie'=ic,ie'=id {
+                                        Set stre=ie_"/"_strd
+                                        Do Go^aocIntcode(.e,.stre)
+                                        ;w !,"--->",ia,*9,ib,*9,ic,*9,id,*9,ie,!
+                                        ;zw stre
+                                        Set results(stre)=""
+                                    }                                    
+                                }                                
+                            }                            
+                        }                        
+                    }                    
+                }                
+            }            
+        }
+    }
+}

@@ -1,18 +1,36 @@
 ROUTINE aocIntcode
 
-Go(Memory)[]PUBLIC
+Go(Memory,ReadString,HaltOnWrite,Position)[]PUBLIC
 {
-    SET position=0
+    SET position=$get(Position,0),HaltOnWrite=$Get(HaltOnWrite,0),readPointer=1,ReadString=$Get(ReadString,""),toRead=0,halt=0
+    If ReadString'="" {
+        Set toRead=1
+    }    
     SET instruction=$$ParseInstruction(Memory(position),.m1,.m2,.m3)
-    WHILE instruction'=99 {
+    WHILE instruction'=99,halt=0 {
         IF instruction=1 {
             SET position=$$Sum(position,.Memory,m1,m2)
         } ELSEIF instruction=2 {
             SET position=$$Multiply(position,.Memory,m1,m2)
         } ElseIf instruction=3 {
-            Set position=$$Read(position,.Memory)
-        }	ElseIf instruction=4 {
-            Set position=$$Write(position,.Memory,m1)
+            Set value=""
+            If ReadString'="" {
+                ;w !,"RE1:",ReadString,"*",!
+                Set value=$Piece(ReadString,"/")
+                Set ReadString=$Piece(ReadString,"/",2,$Length(ReadString,"/"))
+                ;w !,"RE2:",ReadString,"*",*9,value,!
+            }            
+            Set position=$$Read(position,.Memory,value)
+        }	ElseIf instruction=4 {                 
+            If toRead {
+                Set position=$$Write(position,.Memory,m1,toRead,.ReadString)                
+            } Else {
+                Set position=$$Write(position,.Memory,m1,)  
+            }           
+            If HaltOnWrite {
+                Set halt=1
+            }
+              
         } ElseIf instruction=5 {
             Set position=$$JumpIfTrue(position,.Memory,m1,m2)
         } ElseIf instruction=6 {
@@ -24,7 +42,10 @@ Go(Memory)[]PUBLIC
         }
         SET instruction=$$ParseInstruction(Memory(position),.m1,.m2,.m3)
     }
-
+    If instruction=99 {
+        Kill Memory
+    }    
+    Quit position
 }
 
 ParseInstruction(Instruction,M1,M2,M3){
@@ -67,20 +88,36 @@ Multiply(CurrentPosition,Memory,M1,M2){
     Set Memory(target)=val1*val2
     Quit CurrentPosition+4
 }
-Read(CurrentPosition,Memory){
-    Write !,"Read: "
-    Read xx
+Read(CurrentPosition,Memory,Value){
+    If Value="" {
+        Write !,"Read: "
+        Read xx        
+    } else {
+        Set xx=Value
+    }    
     Set target=Memory(CurrentPosition+1)
     Set Memory(target)=xx
     q CurrentPosition+2
 }
-Write(CurrentPosition,Memory,M1){
+Write(CurrentPosition,Memory,M1,ToRead,ReadString){
+    Set ToRead=$g(ToRead,0),ReadString=$Get(ReadString,"")
     SET posval1=Memory(CurrentPosition+1)
     if M1=0 {
-        Write !,Memory(posval1)
+        set value=Memory(posval1)
     } else{
-        Write !,posval1
+        set value=posval1
     }
+    If 'ToRead {
+        w !,value
+    } Else {
+        If ReadString'="" {
+            Set ReadString=value_"/"_ReadString            
+        } Else {
+            set ReadString=value
+        }
+    }
+    
+    
     q CurrentPosition+2
 }
 JumpIfFalse(CurrentPosition,Memory,M1,M2){
