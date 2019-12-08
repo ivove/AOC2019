@@ -1,0 +1,115 @@
+ROUTINE aoc2019D8
+
+Part1(Path,Width,Height)[]PUBLIC
+{
+    DO FileReader^Util(Path,.file)
+    Set layer=1
+    Set w=0,h=0
+    For i=1:1:file {
+        Set line=file(i)
+        Set len=$Length(line)
+        For c=1:1:len {
+            Set image(layer,h,w)=$Extract(line,c)
+            Set w=w+1
+            If w=Width {
+                Set w=0,h=h+1
+                If h=Height {
+                    Set h=0,layer=layer+1
+                }                
+            }            
+        }        
+    }
+    Set min=99999999999,zeroLayer=""
+    Set l=$Order(image(""))
+    While l'="" {
+        Set zero=$$count(.image,l,0)
+        If zero<min {
+            Set min=zero,zeroLayer=l
+        }        
+        Set l=$Order(image(l))
+    }
+    Quit ($$count(.image,zeroLayer,1)*$$count(.image,zeroLayer,2))
+}
+
+count(Image,Layer,ToCount)[]
+{
+    Set zeroCount=0
+    s h=$Order(Image(Layer,""))
+    While h'="" {
+        Set w=$Order(Image(Layer,h,""))
+        While w'="" {
+            If Image(Layer,h,w)=ToCount {
+                Set zeroCount=zeroCount+1
+            }            
+            s w=$Order(Image(Layer,h,w))
+        }        
+        Set h=$Order(Image(Layer,h))
+    }    
+    q zeroCount
+}
+
+Part2(Path,Width,Height)[]PUBLIC
+{
+    DO FileReader^Util(Path,.file)
+    Set layer=1
+    Set w=0,h=0
+    For i=1:1:file {
+        Set line=file(i)
+        Set len=$Length(line)
+        For c=1:1:len {
+            Set image(layer,h,w)=$Extract(line,c)
+            Set w=w+1
+            If w=Width {
+                Set w=0,h=h+1
+                If h=Height {
+                    Set h=0,layer=layer+1
+                }                
+            }            
+        }        
+    }
+    d renderImage(.image)
+}
+
+renderImage(Image)
+{
+    Set y=$Order(Image(1,""))
+    While y'="" {
+        Set x=$Order(Image(1,y,""))
+        While x'="" {
+            Set rendered(y,x)=$$renderPixel(.Image,x,y)
+            Set x=$Order(Image(1,y,x))
+        }
+        Set y=$Order(Image(1,y))
+    }
+    Set y=$Order(rendered(""))
+    While y'="" {
+        Set x=$Order(rendered(y,""))
+        While x'="" {
+            w rendered(y,x)
+            Set x=$Order(rendered(y,x))
+        }   
+        w !  
+        Set y=$Order(rendered(y))
+    }
+    
+}
+
+renderPixel(Image,x,y)
+{
+    Set pixel=" "
+    Set cont=1,layer=1
+    while cont,layer'="" {
+        Set value=Image(layer,y,x)
+        If value<2 {
+            Set cont=0
+            If value=0 {
+                Set pixel=" "
+            } Else {
+                Set pixel="#"
+            }
+            
+        }        
+        Set layer=$Order(Image(layer))
+    }
+    q pixel
+}
