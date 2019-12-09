@@ -1,0 +1,14 @@
+ROUTINE aoc2019D9
+
+Part1(Path)[]PUBLIC
+{
+    DO FileReader^Util(Path,.file)
+    Set counter=0
+    FOR i=1:1:file {
+        FOR y=1:1:$Length(file(i),",") {
+            SET intcode(counter)=$PIECE(file(i),",",y)
+            SET counter=counter+1
+        }        
+    }
+    Do Go^aocIntcode(.intcode)
+}
