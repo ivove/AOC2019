@@ -60,11 +60,11 @@ GetDelta(Width,Height,Delta)[] PUBLIC {
 
 GetDelta2(Width,Height,Delta)[]PUBLIC
 {
-    Set Delta(0)="0,1",Delta(99)="1,0",Delta(-99)="0,-1"
+    Set Delta(0)="1,0",Delta(-99)="0,-1"
     For x=1:1:Width {
         For y=(-1*Height):1:Height {
             Set hh=9999
-            if y'=0 { set hh=x/y }
+            if y'=0 { set hh=y/x }
             If x'=0,y'=0,'$data(h(hh)) {
                 Set Delta(hh)=x_","_y
                 Set h(hh)=""
@@ -115,8 +115,38 @@ Part2(Path)[]PUBLIC
         i count>max { s max=count,f=c }
         Set c=$Order(map(c))
     }
+    k delta
+    d GetDelta2(maxX,maxY,.delta)
+    Write !,f
+    Set $Listbuild(x,y)=$Listfromstring(f,",")
+    Set count=0,cont=1,last="",d="",multi=1
+    While cont {
+        Set d=$o(delta(d))
+        If d="" {
+            Set d=$Order(delta(d)),multi=multi*-1
+        }
+        Set $Listbuild(dx,dy)=$Listfromstring(delta(d),",")
+        s ox=x,oy=y,go=1
+        While go,ox<maxX,oy<maxY,ox>0,oy>0 {
+            Set ox=ox+(dx*multi),oy=oy+(dy*multi)
+            If count=0 {
+                w !,ox,*9,oy,*9,delta(d),*9,multi
+            }
+            
+            i $d(map(ox_","_oy)) {
+                Set last=ox_","_oy
+                ;Write !,count,*9,last
+                k map(last)
+                s go=0,count=count+1
+            }
+        }
+        If count=200 {
+            Set cont=0
+        }
+        
+    }
     
-    q f 
+    q $Piece(last,",")*100+$Piece(last,",",2)
 }
 GetMap(Path,map)[]PUBLIC
 {
