@@ -1,0 +1,259 @@
+ROUTINE aoc2019D10
+
+Part1(Path)[]PUBLIC
+{
+    DO FileReader^Util(Path,.file)
+    Set counter=0
+    FOR y=1:1:file {
+        Set line=file(y)
+        For x=1:1:$length(line) {
+            set val=$e(line,x)
+            If val="#" {
+                Set coord=(x-1)_","_(y-1)
+                Set map(coord)=""
+            }            
+        }        
+    }
+    set maxY=file,maxX=$Length(file(1)),max=0
+    d GetDelta(maxX,maxY,.delta)
+    Set c=$o(map(""))
+    While c'="" {
+        Set $Listbuild(x,y)=$Listfromstring(c,","),count=0
+        s d=$Order(delta(""))
+        While d'="" {
+            Set $Listbuild(dx,dy)=$Listfromstring(d,",")
+            s ox=x,oy=y,cont=1
+            While cont,ox<maxX,oy<maxY {
+                Set ox=ox+dx,oy=oy+dy
+                i $d(map(ox_","_oy)) {
+                    set count=count+1,cont=0
+                }
+            }
+            s ox=x,oy=y,cont=1
+            While cont,ox>0,oy>0 {
+                Set ox=ox-dx,oy=oy-dy
+                i $d(map(ox_","_oy)) {
+                    set count=count+1,cont=0
+                }
+            }
+            Set d=$Order(delta(d))
+        }
+        i count>max { s max=count }
+        Set c=$Order(map(c))
+    }
+    
+    q max 
+}
+GetDelta(Width,Height,Delta)[] PUBLIC {
+    Set Delta("0,1")="",Delta("1,0")=""
+    For x=1:1:Width {
+        For y=(-1*Height):1:Height {
+            Set hh=9999
+            if y'=0 { set hh=x/y }
+            If '$data(h(hh)) {
+                Set Delta(x_","_y)=""
+                Set h(hh)=""
+            }            
+        }        
+    }    
+}
+
+GetDelta2(Width,Height,Delta)[]PUBLIC
+{
+    Set Delta(0)="0,1",Delta(99)="1,0",Delta(-99)="0,-1"
+    For x=1:1:Width {
+        For y=(-1*Height):1:Height {
+            Set hh=9999
+            if y'=0 { set hh=x/y }
+            If x'=0,y'=0,'$data(h(hh)) {
+                Set Delta(hh)=x_","_y
+                Set h(hh)=""
+            }            
+        }        
+    }
+    
+}
+
+Part2(Path)[]PUBLIC
+{
+    DO FileReader^Util(Path,.file)
+    Set counter=0
+    FOR y=1:1:file {
+        Set line=file(y)
+        For x=1:1:$length(line) {
+            set val=$e(line,x)
+            If val="#" {
+                Set coord=(x-1)_","_(y-1)
+                Set map(coord)=""
+            }            
+        }        
+    }
+    set maxY=file,maxX=$Length(file(1)),max=0,f=""
+    d GetDelta(maxX,maxY,.delta)
+    Set c=$o(map(""))
+    While c'="" {
+        Set $Listbuild(x,y)=$Listfromstring(c,","),count=0
+        s d=$Order(delta(""))
+        While d'="" {
+            Set $Listbuild(dx,dy)=$Listfromstring(d,",")
+            s ox=x,oy=y,cont=1
+            While cont,ox<maxX,oy<maxY {
+                Set ox=ox+dx,oy=oy+dy
+                i $d(map(ox_","_oy)) {
+                    set count=count+1,cont=0
+                }
+            }
+            s ox=x,oy=y,cont=1
+            While cont,ox>0,oy>0 {
+                Set ox=ox-dx,oy=oy-dy
+                i $d(map(ox_","_oy)) {
+                    set count=count+1,cont=0
+                }
+            }
+            Set d=$Order(delta(d))
+        }
+        i count>max { s max=count,f=c }
+        Set c=$Order(map(c))
+    }
+    
+    q f 
+}
+GetMap(Path,map)[]PUBLIC
+{
+    DO FileReader^Util(Path,.file)
+    FOR y=1:1:file {
+        Set line=file(y)
+        For x=1:1:$length(line) {
+            set val=$e(line,x)
+            If val="#" {
+                Set map(x-1,y-1)=""
+            }            
+        }        
+    }
+}
+Check(x,y,map)[]PUBLIC
+{
+    Set count=0
+    Set cx=$o(map(""))
+    While cx'="" {
+        Set cy=$Order(map(cx,""))
+        While cy'="" {
+            If '((x=cx)&&(y=cy)) {
+                Set blocked=0,blockedBy=""
+                Set gx=$Order(map(""))
+                While gx'="",blocked=0 {
+                    Set gy=$Order(map(gx,""))
+                    While gy'="",blocked=0 {
+                        If ('((x=gx)&&(y=gy)))&&('((gx=cx)&&(gy=cy))) {
+                            ;w !,*9,x,*9,y,*9,cx,*9,cy,*9,gx,*9,gy,*9,$$Contains(x,y,cx,cy,gx,gy)
+                            If $$Contains(x,y,cx,cy,gx,gy) {
+                                Set blocked=1,blockedBy=(gx_","_gy)
+                            }                               
+                        }                        
+                        Set gy=$Order(map(gx,gy))
+                    }
+                    Set gx=$o(map(gx))
+                }  
+                ;w !,*9,x,*9,y,*9,cx,*9,cy,*9,blocked,*9,blockedBy
+                if 'blocked { Set count=count+1 }              
+            }            
+            Set cy=$o(map(cx,cy))
+        }        
+        s cx=$Order(map(cx))
+    }
+    Quit count
+}
+IsVert(x1,x2)[]
+{
+    Set ver=0
+    If x1=x2 {
+        Set ver=1
+    }
+    quit ver    
+}
+IsHor(y1,y2)
+{
+    Set hor=0
+    If y1=y2 {
+        Set hor=1
+    }
+    Quit hor
+}
+Helling(x1,y1,x2,y2)[]PUBLIC
+{
+    Set hel=0
+    If $$IsVert(x1,x2) {
+        Set hel=99
+    }
+    ElseIf $$IsHor(y1,y2) {
+        Set hel=0
+    }
+    Else {
+        Set hel=(y2-y1)/(x2-x1)
+    }	
+    q $j(hel,0,14)
+}
+Ctx(x1,y1,x2,y2)[]PUBLIC
+{
+    Set hel=$$Helling(x1,y1,x2,y2)
+    Set ctx=0
+    i '$$IsVert(x1,x2){
+        Set ctx=y1-(hel*x1)
+    } Else {
+        set ctx=x1
+    }	
+    Quit ctx
+}
+GetY(x,y,cx,cy,gx)[]PUBLIC
+{
+    Quit ($$Helling(x,y,cx,cy)*gx+$$Ctx(x,y,cx,cy))
+}
+Contains(x,y,cx,cy,gx,gy)[]PUBLIC{
+    Set ok=0
+    If $$IsHor(y,cy) {
+        ;w !,"h"
+        If gy=y {
+            Set ok=1
+        }        
+    }
+    ElseIf $$IsVert(x,cx) {
+        ;w !,"v"
+        If gx=x {
+            Set ok=1
+        }        
+    } Else {
+        If $$GetY(x,y,cx,cy,gx)=gy {
+            Set ok=1
+        }        
+    }
+    If ok,$$IsBetween(x,cx,gx),$$IsBetween(y,cy,gy) {
+        Set ok=1
+    } Else {
+        Set ok=0
+    }    
+    Quit ok
+}
+IsBetween(a,b,t)
+{
+    Set res=0
+    set max=$$Max(a,b)
+    Set min=$$Min(a,b)
+    If t>=min,t<=max {
+        Set res=1
+    }    
+    Quit res
+}
+Max(a,b){
+    s max=b
+    If a>b {
+        Set max=a
+    }
+    Quit max    
+}
+Min(a,b){
+    Set min=b
+    If a<b {
+        Set min=a
+    }
+    Quit min    
+}
