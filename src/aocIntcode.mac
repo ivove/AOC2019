@@ -43,7 +43,7 @@ Go(Memory,ReadString,HaltOnWrite,Position)[]PUBLIC
         } ElseIf instruction=9 {
              Set position=$$SetBase(position,.Memory,m1,.base)
         }	
-        SET instruction=$$ParseInstruction(Memory(position),.m1,.m2,.m3)
+        SET instruction=$$ParseInstruction(Memory(+position),.m1,.m2,.m3)
     }
     If instruction=99 {
         Kill Memory
@@ -61,20 +61,20 @@ ParseInstruction(Instruction,M1,M2,M3){
 
 Sum(CurrentPosition,Memory,M1,M2,M3,Base){
     Set M1=$Get(M1,0),M2=$Get(M2,0),M3=$Get(M3,0),Base=$g(Base,0)
-    SET posval1=Memory(CurrentPosition+1),posval2=Memory(CurrentPosition+2),target=Memory(CurrentPosition+3)
+    SET posval1=$g(Memory(CurrentPosition+1)),posval2=$g(Memory(CurrentPosition+2)),target=$g(Memory(CurrentPosition+3))
     if M1=0 {
-        SET val1=Memory(posval1)
+        SET val1=$g(Memory(posval1))
     } Elseif M1=1 {
         Set val1=posval1
     } else {
-        Set val1=Memory(Base+posval1)
+        Set val1=$g(Memory(Base+posval1))
     }
     if M2=0 {
-        Set val2=Memory(posval2)
+        Set val2=$g(Memory(posval2))
     } Elseif M2=1 {
         Set val2=posval2
     } else {
-        set val2=Memory(Base+posval2)
+        set val2=$g(Memory(Base+posval2))
     }
     if M3=2{
         Set target=Base+target
@@ -84,20 +84,20 @@ Sum(CurrentPosition,Memory,M1,M2,M3,Base){
 }
 Multiply(CurrentPosition,Memory,M1,M2,M3,Base){
     Set M1=$Get(M1,0),M2=$Get(M2,0)
-    SET posval1=Memory(CurrentPosition+1),posval2=Memory(CurrentPosition+2),target=Memory(CurrentPosition+3)
+    SET posval1=$g(Memory(CurrentPosition+1)),posval2=$g(Memory(CurrentPosition+2)),target=$g(Memory(CurrentPosition+3))
     if M1=0 {
-        SET val1=Memory(posval1)
+        SET val1=$g(Memory(posval1))
     } Elseif M1=1 {
         Set val1=posval1
     } else {
-        Set val1=Memory(Base+posval1)
+        Set val1=$g(Memory(Base+posval1))
     }
     if M2=0 {
-        Set val2=Memory(posval2)
+        Set val2=$g(Memory(posval2))
     } Elseif M2=1 {
         Set val2=posval2
     } else {
-        set val2=Memory(Base+posval2)
+        set val2=$g(Memory(Base+posval2))
     }
     if M3=2{
         Set target=Base+target
@@ -116,7 +116,7 @@ Read(CurrentPosition,Memory,Value,M1,Base){
     If M1=2 {
         Set target=Base+target
     }    
-    w !,M1,*9,Base,*9,target,*9,Memory(CurrentPosition+1)
+    ;w !,M1,*9,Base,*9,target,*9,Memory(CurrentPosition+1)
     Set Memory(target)=xx
     q CurrentPosition+2
 }
@@ -169,18 +169,18 @@ JumpIfTrue(CurrentPosition,Memory,M1,M2,Base){
     Set M1=$Get(M1,0),M2=$Get(M2,0)
     SET posval1=Memory(CurrentPosition+1),posval2=Memory(CurrentPosition+2)
      if M1=0 {
-        SET val1=Memory(posval1)
+        SET val1=$g(Memory(posval1))
     } Elseif M1=1 {
         Set val1=posval1
     } else {
-        Set val1=Memory(Base+posval1)
+        Set val1=$g(Memory(Base+posval1))
     }
     if M2=0 {
-        Set val2=Memory(posval2)
+        Set val2=$g(Memory(posval2))
     } Elseif M2=1 {
         Set val2=posval2
     } else {
-        set val2=Memory(Base+posval2)
+        set val2=$g(Memory(Base+posval2))
     }
     If val1'=0 {
         Set CurrentPosition=val2

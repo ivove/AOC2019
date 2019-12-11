@@ -1,0 +1,122 @@
+ROUTINE aoc2019D11
+
+Part1(Path)[]PUBLIC
+{
+    DO FileReader^Util(Path,.file)
+    Set counter=0
+    FOR i=1:1:file {
+        FOR y=1:1:$Length(file(i),",") {
+            SET intcode(counter)=$PIECE(file(i),",",y)
+            SET counter=counter+1
+        }        
+    }
+    Set count=0,pos=0,dir="u",x=0,y=0
+    While $d(intcode) {
+        Set val=$g(panels(x,y),0)
+        Set pos=$$Go^aocIntcode(.intcode,.val,1,pos)
+        If '$data(panels(x,y)) {
+            Set count=count+1
+        }        
+        Set panels(x,y)=val
+        Set val=" "
+        If $d(intcode) {
+        Set pos=$$Go^aocIntcode(.intcode,.val,1,pos)
+        i count<10 {
+            w !,val,*9,dir
+            r xx
+        }
+        If $p(val,"/")=0 {
+            if dir="u" { Set dir="l" }
+            elseif dir="l" { Set dir="d" }
+            elseif dir="d" { Set dir="r" }
+            elseif dir="r" { Set dir="u" }
+        } else {
+            if dir="u" { Set dir="r" }
+            elseif dir="l" { Set dir="u" }
+            elseif dir="d" { Set dir="l" }
+            elseif dir="r" { Set dir="d" }
+        }
+        if dir="u" { Set y=y-1 }
+        elseif dir="l" { Set x=x-1 }
+        elseif dir="d" { Set y=y+1 }
+        elseif dir="r" { Set x=x+1 }
+        ;i count<10 {
+        ;    w !,*9,dir,*9,x,*9,y
+        ;    r xx
+        ;}
+        }
+    }
+    zw panels
+    Quit count
+}
+
+Part2(Path)[]PUBLIC
+{
+    DO FileReader^Util(Path,.file)
+    Set counter=0
+    FOR i=1:1:file {
+        FOR y=1:1:$Length(file(i),",") {
+            SET intcode(counter)=$PIECE(file(i),",",y)
+            SET counter=counter+1
+        }        
+    }
+    ;d Go^aocIntcode(.intcode)
+    Set count=1,pos=0,dir="u",x=0,y=0,panels(x,y)=1
+    While $d(intcode) {
+        Set val=$g(panels(x,y),0)
+        Set pos=$$Go^aocIntcode(.intcode,.val,1,pos)
+        If '$data(panels(x,y)) {
+            Set count=count+1
+        }        
+        Set panels(x,y)=val
+        Set val=" "
+        If $d(intcode) {
+        Set pos=$$Go^aocIntcode(.intcode,.val,1,pos)
+        
+        If $p(val,"/")=0 {
+            if dir="u" { Set dir="l" }
+            elseif dir="l" { Set dir="d" }
+            elseif dir="d" { Set dir="r" }
+            elseif dir="r" { Set dir="u" }
+        } else {
+            if dir="u" { Set dir="r" }
+            elseif dir="l" { Set dir="u" }
+            elseif dir="d" { Set dir="l" }
+            elseif dir="r" { Set dir="d" }
+        }
+        if dir="u" { Set y=y-1 }
+        elseif dir="l" { Set x=x-1 }
+        elseif dir="d" { Set y=y+1 }
+        elseif dir="r" { Set x=x+1 }
+        ;i count<10 {
+        ;    w !,*9,dir,*9,x,*9,y
+        ;    r xx
+        ;}
+        }
+    }
+
+    s x=$Order(panels(""))
+    While x'="" {
+        Set y=$Order(panels(x,""))
+        While y'="" {
+            s val=" "
+            If panels(x,y)=0 {
+                Set val="#"
+            }
+            
+            Set lines(y)=$g(lines(y))_val
+            Set y=$Order(panels(x,y))
+        }
+        
+        Set x=$Order(panels(x))
+    }
+    
+    Set l=$Order(lines(""))
+    While l'="" {
+        w !,lines(l)
+        Set l=$Order(lines(l))
+    }
+    
+    zw panels
+    Quit count
+}
