@@ -1,0 +1,117 @@
+ROUTINE aoc2019D12
+
+Part1(Path,Steps)[]PUBLIC
+{
+     DO FileReader^Util(Path,.file)
+    FOR i=1:1:file {
+        Set line=file(i)
+        s line=$tr(line,"<= >xyz","")
+        Set plan(i)=$Listfromstring(line)
+        Set vel(i)=$lb(0,0,0)
+    }
+    For s=1:1:Steps {
+        For p=1:1:4 {
+            Set dx=0,dy=0,dz=0
+            For x=1:1:4 {
+                If p'=x {
+                    If $li(plan(p),1)<$li(plan(x),1) {
+                        Set dx=dx+1
+                    } ElseIf $li(plan(p),1)>$li(plan(x),1) {
+                        Set dx=dx-1
+                    }	
+                    If $li(plan(p),2)<$li(plan(x),2) {
+                        Set dy=dy+1
+                    } ElseIf $li(plan(p),2)>$li(plan(x),2) {
+                        Set dy=dy-1
+                    }	
+                    If $li(plan(p),3)<$li(plan(x),3) {
+                        Set dz=dz+1
+                    } ElseIf $li(plan(p),3)>$li(plan(x),3) {
+                        Set dz=dz-1
+                    }	
+                }                
+            } 
+            Set $li(vel(p),1)=$li(vel(p),1)+dx     
+            Set $li(vel(p),2)=$li(vel(p),2)+dy
+            Set $li(vel(p),3)=$li(vel(p),3)+dz
+        }
+        For p=1:1:4 {
+            Set $li(plan(p),1)=$li(plan(p),1)+$li(vel(p),1)
+            Set $li(plan(p),2)=$li(plan(p),2)+$li(vel(p),2)
+            Set $li(plan(p),3)=$li(plan(p),3)+$li(vel(p),3)
+        }
+        
+    }    
+    Set en=0
+    f i=1:1:4 {
+        Set pot=0,kin=0
+        For x=1:1:3 {
+            Set pot=pot+$ZAbs($li(plan(i),x))
+            Set kin=kin+$ZAbs($li(vel(i),x))
+        }
+        Set en=en+(pot*kin)
+    }
+    q en
+}
+
+Part2(Path)[]PUBLIC
+{
+     DO FileReader^Util(Path,.file)
+    FOR i=1:1:file {
+        Set line=file(i)
+        s line=$tr(line,"<= >xyz","")
+        Set plan(i)=$Listfromstring(line)
+        Set vel(i)=$lb(0,0,0)
+    }
+    set cont=1,steps=0
+    while cont {
+        set ^||states($$getState(.plan,.vel))=""
+        For p=1:1:4 {
+            Set dx=0,dy=0,dz=0
+            For x=1:1:4 {
+                If p'=x {
+                    If $li(plan(p),1)<$li(plan(x),1) {
+                        Set dx=dx+1
+                    } ElseIf $li(plan(p),1)>$li(plan(x),1) {
+                        Set dx=dx-1
+                    }	
+                    If $li(plan(p),2)<$li(plan(x),2) {
+                        Set dy=dy+1
+                    } ElseIf $li(plan(p),2)>$li(plan(x),2) {
+                        Set dy=dy-1
+                    }	
+                    If $li(plan(p),3)<$li(plan(x),3) {
+                        Set dz=dz+1
+                    } ElseIf $li(plan(p),3)>$li(plan(x),3) {
+                        Set dz=dz-1
+                    }	
+                }                
+            } 
+            Set $li(vel(p),1)=$li(vel(p),1)+dx     
+            Set $li(vel(p),2)=$li(vel(p),2)+dy
+            Set $li(vel(p),3)=$li(vel(p),3)+dz
+        }
+        For p=1:1:4 {
+            Set $li(plan(p),1)=$li(plan(p),1)+$li(vel(p),1)
+            Set $li(plan(p),2)=$li(plan(p),2)+$li(vel(p),2)
+            Set $li(plan(p),3)=$li(plan(p),3)+$li(vel(p),3)
+        }
+        Set steps=steps+1
+        If $data(^||states($$getState(.plan,.vel))) {
+            set cont=0
+        }
+        
+    }    
+    
+    q steps
+}
+
+getState(plan,vel){
+    set state=""
+    For i=1:1:4 {    
+        For x=1:1:3 {
+            Set state=state_$li(plan(i),x)_"-"_$li(vel(i),x)_","
+        }
+    }
+    Quit state
+}
