@@ -1,9 +1,9 @@
 ROUTINE aocIntcode
 
-Go(Memory,ReadString,HaltOnWrite,Position)[]PUBLIC
+Go(Memory,ReadString,HaltOnWrite,Position,Write,WriteString)[]PUBLIC
 {
     SET position=$get(Position,0),HaltOnWrite=$Get(HaltOnWrite,0),readPointer=1,ReadString=$Get(ReadString,""),toRead=0,halt=0
-    Set base=0
+    Set base=$g(^||base,0)
     If ReadString'="" {
         Set toRead=1
     }    
@@ -22,12 +22,16 @@ Go(Memory,ReadString,HaltOnWrite,Position)[]PUBLIC
                 ;w !,"RE2:",ReadString,"*",*9,value,!
             }            
             Set position=$$Read(position,.Memory,value,m1,base)
-        }	ElseIf instruction=4 {                 
-            If toRead {
-                Set position=$$Write(position,.Memory,m1,toRead,.ReadString,base)                
-            } Else {
-                Set position=$$Write(position,.Memory,m1,,,base)  
-            }           
+        }	ElseIf instruction=4 {    
+            If $g(Write,1)=1 {
+                If toRead {
+                    Set position=$$Write(position,.Memory,m1,toRead,.ReadString,base)                
+                } Else {
+                    Set position=$$Write(position,.Memory,m1,,,base)  
+                } 
+            } else {
+                Set position=$$Write(position,.Memory,m1,toRead,.ReadString,base,0,.WriteString)  
+            }         
             If HaltOnWrite {
                 Set halt=1
             }
@@ -107,7 +111,7 @@ Multiply(CurrentPosition,Memory,M1,M2,M3,Base){
 }
 Read(CurrentPosition,Memory,Value,M1,Base){
     If Value="" {
-        Write !,"Read: "
+        Write "Read: "
         Read xx        
     } else {
         Set xx=Value
@@ -120,8 +124,8 @@ Read(CurrentPosition,Memory,Value,M1,Base){
     Set Memory(target)=xx
     q CurrentPosition+2
 }
-Write(CurrentPosition,Memory,M1,ToRead,ReadString,Base){
-    Set ToRead=$g(ToRead,0),ReadString=$Get(ReadString,"")
+Write(CurrentPosition,Memory,M1,ToRead,ReadString,Base,Write,WriteString){
+    Set ToRead=$g(ToRead,0),ReadString=$Get(ReadString,""),Write=$Get(Write,1)
     SET posval1=Memory(CurrentPosition+1)
     if M1=0 {
         SET val1=Memory(posval1)
@@ -130,15 +134,20 @@ Write(CurrentPosition,Memory,M1,ToRead,ReadString,Base){
     } else {
         Set val1=Memory(Base+posval1)
     }
-    If 'ToRead {
-        w !,val1
-    } Else {
-        If ReadString'="" {
-            Set ReadString=val1_"/"_ReadString            
+    if Write {
+        If 'ToRead {
+            w !,val1
         } Else {
-            set ReadString=val1
+            If ReadString'="" {
+                Set ReadString=val1_"/"_ReadString            
+            } Else {
+                set ReadString=val1
+            }
         }
     }
+    Else  {
+        Set WriteString=val1
+    }	
     q CurrentPosition+2
 }
 JumpIfFalse(CurrentPosition,Memory,M1,M2,Base){
@@ -253,5 +262,6 @@ SetBase(CurrentPosition,Memory,M1,Base){
         Set val1=Memory(Base+posval1)
     }
     Set Base=Base+val1
+    s ^||base=Base
     Quit CurrentPosition+2
 }

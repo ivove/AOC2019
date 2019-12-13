@@ -1,0 +1,92 @@
+ROUTINE aoc2019D13
+
+Part1(Path)[]PUBLIC
+{
+    DO FileReader^Util(Path,.file)
+    Set counter=0
+    FOR i=1:1:file {
+        FOR y=1:1:$Length(file(i),",") {
+            SET intcode(counter)=$PIECE(file(i),",",y)
+            SET counter=counter+1
+        }        
+    }
+    ;d Go^aocIntcode(.intcode)
+    Set count=0,pos=0
+    While $d(intcode) {
+        Set val=" "
+        Set pos=$$Go^aocIntcode(.intcode,.val,1,pos)
+        Set val=" "
+        if $Data(intcode) { Set pos=$$Go^aocIntcode(.intcode,.val,1,pos) }
+        Set val=" "
+        if $Data(intcode) { Set pos=$$Go^aocIntcode(.intcode,.val,1,pos) }
+        if $p(val,"/")=2 {
+            Set count=count+1
+        }
+    }
+    Quit count
+}
+
+
+Part2(Path)[]PUBLIC
+{
+    f y=0:1:30 {
+        For x=1:1:81 {
+            w /cup(y,x)," "
+        }
+        
+    }
+
+    DO FileReader^Util(Path,.file)
+    Set counter=0
+    FOR i=1:1:file {
+        FOR y=1:1:$Length(file(i),",") {
+            SET intcode(counter)=$PIECE(file(i),",",y)
+            SET counter=counter+1
+        }        
+    }
+    Set intcode(0)=2
+    ;d Go^aocIntcode(.intcode)
+    Set count=0,pos=0
+    While $d(intcode) {
+        Set val=" "
+        Set pos=$$Go^aocIntcode(.intcode,"",1,pos,0,.x)
+        Set val=" "
+        if $Data(intcode) { Set pos=$$Go^aocIntcode(.intcode,"",1,pos,0,.y) }
+        Set val=" "
+        if $Data(intcode) { Set pos=$$Go^aocIntcode(.intcode,"",1,pos,0,.type) }
+        s tile=" "
+        If type=1 {
+            Set tile="#"            
+        } ElseIf type=2 {
+            Set tile="@"
+        } ElseIf type=3 {
+            Set tile="_"
+        } ElseIf type=4 {
+            Set tile="0"
+        }	       
+        If x=-1 {
+            For x=45:1:80 {
+                w /cup(4,50)," "
+            }
+            
+            w /cup(4,50),type
+        } else {         
+            w /cup(y+1,x+1),tile
+        }
+        if $p(val,"/")=2 {
+            Set count=count+1
+        }
+        w /cup(3,50),""
+    }
+    Quit count
+}
+
+xx()[]PUBLIC
+{
+    s x=5,score=0
+    For i=1:1:312 {
+        s score=score+i
+        Set x=x+1
+    }
+    q score
+}
